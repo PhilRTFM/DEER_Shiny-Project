@@ -1,6 +1,4 @@
-# 🦌 D.E.E.R. Shiny - Differential Expression and Enrichment in R!
-<img width="252" height="291" alt="DEER_logo" src="https://github.com/user-attachments/assets/97369f9f-cfd8-474b-9175-f689d622aabd" />
-
+# 🦌 D.E.E.R. Shiny - Differential Expression and Enrichment in R
 
 **Auteur :** Philippe Stocker
 **Affiliation :** Université de Rouen Normandie – Master 2 Bioinformatique
@@ -16,7 +14,7 @@ Son objectif est de fournir un outil **ergonomique, interactif et modulaire** po
 * Explorer les résultats d’**analyse d’expression différentielle** (RNA-seq) ;
 * Visualiser les **log2 Fold Change** sous forme de **Volcano Plot** ;
 * Intégrer à terme des modules d’**enrichissement fonctionnel (GO, KEGG)** ;
-* Offrir une interface claire et harmonisée pour les biologistes.
+* Offrir une interface claire et harmonisée pour la recherche biomédicale.
 
 ---
 

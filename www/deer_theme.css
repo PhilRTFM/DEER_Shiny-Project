@@ -1,0 +1,154 @@
+/* ============================================================
+   D.E.E.R. Shiny Theme - deer_theme.css
+   ============================================================ */
+
+/* Couleurs principales */
+:root {
+  --primary-color: #fdcb6e;
+  --secondary-color: #ffeaa7;
+  --accent-color: #2d3436;
+  --success-color: #55efc4;
+  --danger-color: #d63031;
+}
+
+/* BODY ------------------------------------------------------ */
+body {
+  background-color: #fffef6;
+  color: var(--accent-color);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* HEADER ---------------------------------------------------- */
+.skin-yellow .main-header .navbar {
+  background-color: var(--primary-color);
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.skin-yellow .main-header .logo {
+  background-color: var(--primary-color);
+  color: var(--accent-color) !important;
+  font-weight: 700;
+}
+
+/* SIDEBAR --------------------------------------------------- */
+.skin-yellow .main-sidebar {
+  background-color: var(--primary-color);
+}
+
+.skin-yellow .sidebar a {
+  color: var(--secondary-color);
+  font-weight: 600;
+}
+
+.skin-yellow .sidebar a:hover {
+  background-color: var(--secondary-color);
+  color: var(--accent-color);
+}
+
+.skin-yellow .sidebar-menu > li.active > a {
+  background-color: var(--secondary-color);
+  color: var(--accent-color) !important;
+  font-weight: bold;
+}
+
+/* BOXES ----------------------------------------------------- */
+.box {
+  background-color: #fffdf2;
+  border: 2px solid var(--accent-color);
+  color: var(--accent-color);
+}
+
+.box.box-primary > .box-header {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.box.box-info > .box-header {
+  background-color: var(--secondary-color);
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.box.box-success > .box-header {
+  background-color: var(--success-color);
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+/* BUTTONS --------------------------------------------------- */
+.btn, .btn-default, .btn-primary {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+  border: none;
+  font-weight: 600;
+}
+
+.btn:hover, .btn:focus {
+  background-color: var(--secondary-color);
+  color: var(--accent-color);
+}
+
+/* SLIDERS --------------------------------------------------- */
+.irs-bar, .irs-single, .irs-from, .irs-to {
+  background-color: var(--primary-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+.irs-handle {
+  background-color: var(--secondary-color) !important;
+  border: 2px solid var(--accent-color) !important;
+}
+
+/* DATATABLE ------------------------------------------------- */
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_filter input {
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  padding: 4px;
+}
+
+.dataTable thead th {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+  border-bottom: 2px solid var(--accent-color);
+  text-transform: uppercase;
+}
+
+.dataTable tbody tr:hover {
+  background-color: var(--secondary-color) !important;
+}
+
+/* INFOBOX --------------------------------------------------- */
+.info-box {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  color: var(--accent-color);
+  border-radius: 10px;
+  border: 1px solid var(--accent-color);
+}
+
+/* SPLASH SCREEN --------------------------------------------- */
+#loading-content {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+}
+
+#loading-content h2 {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* LINKS ------------------------------------------------------ */
+a, a:visited {
+  color: var(--accent-color);
+}
+
+a:hover {
+  color: var(--danger-color);
+}
+
+/* TITLES ----------------------------------------------------- */
+h1, h2, h3, h4 {
+  color: var(--accent-color);
+}
