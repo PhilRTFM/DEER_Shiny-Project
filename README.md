@@ -35,9 +35,7 @@ Son objectif est de fournir un outil **ergonomique, interactif et modulaire** po
 
 Depuis RStudio :
 
-- Exécuter le script et 
-
-Ou directement en ligne de commande :
+- Exécuter le script et clicker sur `run app`
 
 Une fois lancée, l’application est accessible à l’adresse :
 👉 **[http://127.0.0.1:xxxx](http://127.0.0.1:xxxx)**
@@ -72,3 +70,4 @@ Les utilisateurs sont libres de le modifier, redistribuer et utiliser à des fin
 ---
 
 > 🦌 *D.E.E.R. Shiny — Exploring differential expression with elegance and precision.*
+
