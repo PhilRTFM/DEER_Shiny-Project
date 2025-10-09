@@ -1,5 +1,8 @@
 # 🦌 D.E.E.R. Shiny - Differential Expression and Enrichment in R
 
+<img width="250" alt="DEER_logo" src="https://github.com/user-attachments/assets/7b77a1b9-1c3e-4558-80d3-8e2515e74f03" />
+
+
 **Auteur :** Philippe Stocker
 **Affiliation :** Université de Rouen Normandie – Master 2 Bioinformatique
 **Contact :** [philippe.stocker@univ-rouen.fr](mailto:philippe.stocker@univ-rouen.fr)
@@ -70,4 +73,5 @@ Les utilisateurs sont libres de le modifier, redistribuer et utiliser à des fin
 ---
 
 > 🦌 *D.E.E.R. Shiny — Exploring differential expression with elegance and precision.*
+
 
