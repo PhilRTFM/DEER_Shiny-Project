@@ -16,7 +16,7 @@ Son objectif est de fournir un outil **ergonomique, interactif et modulaire** po
 * Explorer les résultats d’**analyse d’expression différentielle** (RNA-seq) ;
 * Visualiser les **log2 Fold Change** sous forme de **Volcano Plot** ;
 * Intégrer à terme des modules d’**enrichissement fonctionnel (GO, KEGG)** ;
-* Offrir une interface claire et harmonisée pour la recherche biomédicale.
+* Offrir une interface claire et harmonisée pour les biologistes.
 
 ---
 
