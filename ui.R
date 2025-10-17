@@ -1,38 +1,46 @@
 # ============================================================
 # D.E.E.R. - Differential Expression and Enrichment Analysis in R
-# Project: D.E.E.R. - Shiny app for Volcano plots (Fold Change focused)
+# Project: D.E.E.R. - Shiny app for Differential Expression and Enrichement analysis
 #
-# Description : Projet de Master 2, Développement d'un outil R Shiny pour l'analyse de données transcriptomiques
+# Description : Projet de Master 2, Développement d'un outil R Shiny 
+#pour l'analyse de données transcriptomiques
 #
 # Contact: philippe.stocker@univ-rouen.fr
 # Affiliation: Université de Rouen Normandie
 # ============================================================
 
+## ============================================================
+## PARTIE UI — INTERFACE UTILISATEUR DE L’APPLICATION SHINY
+## ============================================================
+# Cette fonction ui définit l’interface  utilisateur de l'app Shiny, avec  :
+# - La structure générale du tableau de bord (DashboardPage, Header, Sidebar, Body) ;
+# - La mise en page des onglets (Accueil, Analyse, À propos) ;
+# - Le chargement des éléments graphiques et informatifs (logo, icônes, images d’étapes) ;
+# - Les composants interactifs : sélecteurs, boutons, sliders et téléversement de fichiers ;
+# - L’intégration du thème visuel, des couleurs et de l’écran de chargement.
+
 library(shiny)
 library(shinydashboard)
 library(shinycssloaders)
 library(DT)
+library(fresh)
 
-# ============================================================
-# COULEURS GLOBALES
-# ============================================================
-primary_color   <- "#fdcb6e"   # Jaune foncé
-secondary_color <- "#ffeaa7"   # Jaune clair
-accent_color    <- "#2d3436"   # Gris anthracite
+# ---- PALETTE DE COULEURS ----
+primary_color   <- "#fdcb6e"
+secondary_color <- "#ffeaa7"
+accent_color    <- "#2d3436"
 
-# ============================================================
-# UI
-# ============================================================
+# ---- UI ----
 ui <- dashboardPage(
   skin = "yellow",
   
-  # HEADER ----------------------------------------------------
+  # ---- EN-TÊTE ----
   dashboardHeader(
     title = span("🦌 D.E.E.R Shiny",
                  style = paste0("color:", accent_color, "; font-weight:bold;"))
   ),
   
-  # SIDEBAR ---------------------------------------------------
+  # ---- BARRE LATÉRALE ----
   dashboardSidebar(
     sidebarMenu(
       id = "tabs",
@@ -49,11 +57,11 @@ ui <- dashboardPage(
     )
   ),
   
-  # BODY ------------------------------------------------------
+  # ---- CORPS PRINCIPAL ----
   dashboardBody(
-    use_theme("www/deer_theme.css"),  # Application du thème CSS exporté
+    use_theme("www/deer_theme.css"),
     
-    # Splash Screen --------------------------------------------
+    # ---- SPLASH SCREEN ----
     tags$head(
       tags$style(HTML(paste0("
         #loading-content {
@@ -78,22 +86,22 @@ ui <- dashboardPage(
         }
       ")))
     ),
-    
     div(id = "loading-content",
         img(src = "DEER_logo.svg", alt = "Chargement..."),
         h2("Chargement de D.E.E.R.", style = paste0("color:", accent_color, ";"))
     ),
-    
     tags$script(HTML("
       $(document).on('shiny:connected', function() {
         $('#loading-content').fadeOut(800);
       });
     ")),
     
-    # ---- TABS ----
+    # ---- ONGLET PRINCIPAL ----
     tabItems(
       
-      # ---- 1. HOME ----
+      # ============================================================
+      # ---- ONGLET 1 : PAGE D'ACCUEIL ----
+      # ============================================================
       tabItem(tabName = "home_tab",
               fluidRow(
                 box(
@@ -114,38 +122,50 @@ ui <- dashboardPage(
                         tags$li("Offrir une interface claire et harmonisée pour les biologistes.")
                       )
                     )
-                    
                   )
                 )
               ),
               fluidRow(
-                box(title = "Bloc 1 (bientôt disponible)", width = 6, status = "info", height = "300px"),
-                box(title = "Bloc 2 (bientôt disponible)", width = 6, status = "info", height = "300px")
-              )
+                box(title = "Etape 1 : Charger le jeu de données", width = 6, status = "info", height = "250px",
+                    img(src = "step1.png", width = "150px"),
+                    img(src = "step2.png", width = "250px")),
+                box(title = "Etape 2 : Paramètres", width = 6, status = "info", height = "250px",
+                    img(src = "step3.png", width = "200px"))
+              ),
+              box(title = "Etape 3 : Télécharger le Graphique", width = 12, status = "info", height = "150px",
+                  img(src = "step4.png", width = "200px"))
       ),
       
-      # ---- 2. VOLCANO ----
+      # ============================================================
+      # ---- ONGLET 2 : ANALYSE ET VOLCANO PLOT ----
+      # ============================================================
       tabItem(tabName = "volcano_tab",
               fluidRow(infoBoxOutput("count_box", width = 12)),
+              
               fluidRow(
-                box(title = "Volcano Plot (à venir)", width = 8, status = "primary", height = "500px",
+                box(title = "Volcano Plot (à venir)", 
+                    width = 8, status = "primary", height = "500px",
                     div(style = "text-align:center; margin-top:200px; font-style:italic;",
-                        "Le graphique Volcano sera affiché ici.")),
+                        "Le graphique Volcano sera affiché ici.")
+                ),
                 box(title = "Paramètres", width = 4, status = "info",
-                    sliderInput("FCcutoff", "Seuil log2 Fold Change",
-                                min = 0, max = 3, value = 1, step = 0.1),
-                    sliderInput("P-cutoff", "Seuil P-valeur",
-                                min = 0, max = 1, value = 0.05, step = 0.01),
+                    sliderInput("FCcutoff", "Seuil log2 Fold Change", min = 0, max = 3, value = 1, step = 0.1),
+                    sliderInput("P-cutoff", "Seuil P-valeur", min = 0, max = 1, value = 0.05, step = 0.01),
                     textInput("title", "Titre du graphique :", value = "Volcano Plot (FC uniquement)"),
-                    downloadButton("downloadVolcano", "Télécharger le graphique"))
+                    downloadButton("downloadVolcano", "Télécharger le graphique")
+                )
               ),
+              
               fluidRow(
-                box(title = "Table associée au fichier importé", width = 12, status = "success",
+                box(title = "Table associée au fichier importé", 
+                    width = 8, status = "success",
                     withSpinner(dataTableOutput("table_volcano"), type = 8, color = primary_color))
               )
       ),
       
-      # ---- 3. À PROPOS ----
+      # ============================================================
+      # ---- ONGLET 3 : À PROPOS ----
+      # ============================================================
       tabItem(tabName = "about_tab",
               fluidRow(
                 box(width = 12, status = "primary", solidHeader = TRUE,
@@ -157,20 +177,17 @@ ui <- dashboardPage(
                             h3("D.E.E.R. - Differential Expression and Enrichment in R",
                                style = paste0("color:", accent_color, "; font-weight:700;")),
                             p("Application Shiny pour l’analyse et la visualisation des résultats d’expression différentielle 
-                               et d’enrichissement fonctionnel en bioinformatique.",
+                        et d’enrichissement fonctionnel en bioinformatique.",
                               style = paste0("color:", accent_color, "; font-size:16px;")),
                             br(),
                             tags$ul(
                               tags$li(span("Auteur : ", style = "font-weight:bold;"), "Philippe Stocker"),
-                              tags$li(span("Affiliation : ", style = "font-weight:bold;"),
-                                      "Université de Rouen Normandie"),
-                              tags$li(span("Contact : ", style = "font-weight:bold;"),
-                                      "philippe.stocker@univ-rouen.fr")
+                              tags$li(span("Affiliation : ", style = "font-weight:bold;"), "Université de Rouen Normandie"),
+                              tags$li(span("Contact : ", style = "font-weight:bold;"), "philippe.stocker@univ-rouen.fr")
                             ),
                             br(),
                             tags$a(href = "https://github.com/PhilRTFM/DEER_Shiny-Project",
-                                   target = "_blank",
-                                   class = "btn btn-default",
+                                   target = "_blank", class = "btn btn-default",
                                    style = paste0("background-color:", primary_color,
                                                   "; color:", accent_color,
                                                   "; border:none; font-weight:600;"),
