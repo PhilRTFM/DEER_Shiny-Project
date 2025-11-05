@@ -19,7 +19,7 @@ server <- function(input, output, session) {
   
   check_dataset_integrity <- function(df) {
     if (is.null(df) || !is.data.frame(df) || nrow(df) == 0)
-      return(list(valid = FALSE, color = "red", message = "❌ Fichier vide ou non chargé."))
+      return(list(valid = FALSE, color = "red", message = "Fichier vide ou non chargé."))
     
     if (ncol(df) == 1 && grepl(";", df[1, 1]))
       df <- tryCatch(read.csv(input$file$datapath, sep = ";", stringsAsFactors = FALSE), error = function(e) NULL)
@@ -28,16 +28,16 @@ server <- function(input, output, session) {
     missing_cols <- setdiff(required_cols, colnames(df))
     
     if (length(missing_cols) > 0)
-      return(list(valid = FALSE, color = "red", message = paste0("❌ Colonnes manquantes : ", paste(missing_cols, collapse = ", "))))
+      return(list(valid = FALSE, color = "red", message = paste0("Colonnes manquantes : ", paste(missing_cols, collapse = ", "))))
     
     df$log2FC <- suppressWarnings(as.numeric(gsub(",", ".", df$log2FC)))
     df$pval   <- suppressWarnings(as.numeric(gsub(",", ".", df$pval)))
     df$padj   <- suppressWarnings(as.numeric(gsub(",", ".", df$padj)))
     
     if (any(is.na(df$log2FC)) || any(is.na(df$pval)) || any(is.na(df$padj)))
-      return(list(valid = FALSE, color = "red", message = "❌ Les colonnes log2FC, pval ou padj contiennent des valeurs non numériques."))
+      return(list(valid = FALSE, color = "red", message = "Les colonnes log2FC, pval ou padj contiennent des valeurs non numériques."))
     
-    list(valid = TRUE, color = "green", message = "✅ Jeu de données conforme.", df = df)
+    list(valid = TRUE, color = "green", message = "Jeu de données conforme.", df = df)
   }
   
   observeEvent(input$file, {
@@ -151,9 +151,9 @@ server <- function(input, output, session) {
     
     infoBox(
       title = HTML(paste0(
-        "<strong>Points significatifs</strong><br>", n_sig, " (", pct_total, "%)<br><br>",
-        "<strong>Points sur-exprimés</strong><br>", n_over, " (", pct_over, "%)<br><br>",
-        "<strong>Points sous-exprimés</strong><br>", n_under, " (", pct_under, "%)"
+        "<strong>Points significatifs</strong> : ", n_sig, " (", pct_total, "%)<br>",
+        "<strong>Points sur-exprimés</strong> : ", n_over, " (", pct_over, "%)<br>",
+        "<strong>Points sous-exprimés</strong> : ", n_under, " (", pct_under, "%)"
       )),
       value = NULL,
       icon = icon("chart-area"),
