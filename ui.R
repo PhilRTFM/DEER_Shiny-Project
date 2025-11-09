@@ -1,4 +1,4 @@
-# ========================= ui.R (debugged and compatible) =========================
+# ========================= ui.R (Modifié pour Plotly + Onglets DT) =========================
 # D.E.E.R. — Differential Expression & Enrichment in R (multi-select interactive version)
 
 library(shiny)
@@ -6,6 +6,7 @@ library(shinydashboard)
 library(shinycssloaders)
 library(DT)
 library(ggplot2)
+library(plotly) # Ajout de la bibliothèque plotly
 
 # ---- COLORS ----
 primary_color   <- "#fdcb6e"
@@ -74,7 +75,8 @@ ui <- dashboardPage(
                   status = "primary",
                   div(
                     style = "display:flex; align-items:center; justify-content:center;",
-                    plotOutput("volcano_plot", height = "600px", width = "600px") %>%
+                    # Modification : Remplacement de plotOutput par plotlyOutput
+                    plotlyOutput("volcano_plot", height = "600px", width = "600px") %>%
                       withSpinner(type = 8, color = primary_color)
                   )
                 ),
@@ -93,12 +95,24 @@ ui <- dashboardPage(
               ),
               
               # --- Table ---
+              # Modification : Remplacement de box() par tabBox() avec 4 onglets
               fluidRow(
-                box(
-                  title = "Table associée (cliquez ou multi-sélectionnez pour annoter)",
+                tabBox(
+                  title = "Table associée (Sélectionnez dans l'onglet 'Tous')",
                   width = 12,
-                  status = "success",
-                  withSpinner(DTOutput("table_volcano"), type = 8, color = primary_color)
+                  id = "table_tabs",
+                  tabPanel("Tous", 
+                           withSpinner(DTOutput("table_volcano"), type = 8, color = primary_color)
+                  ),
+                  tabPanel("Surexprimés", 
+                           withSpinner(DTOutput("table_over"), type = 8, color = primary_color)
+                  ),
+                  tabPanel("Sousexprimés", 
+                           withSpinner(DTOutput("table_under"), type = 8, color = primary_color)
+                  ),
+                  tabPanel("Sélectionnés", 
+                           withSpinner(DTOutput("table_selected"), type = 8, color = primary_color)
+                  )
                 )
               )
       ),
