@@ -1,8 +1,10 @@
-# ========================= server.R (Sélection multi-onglets + "Select All") =========================
+# ========================= server.R (Axe X dynamique pour tout voir) =========================
+# L'axe X du plot Plotly est maintenant dynamique pour inclure tous les points.
+# L'export ggplot conserve le zoom xlim = c(-3, 3) de l'original.
 
 library(ggplot2)
 library(shiny)
-library(DT) # Crucial pour 'Select' et 'dataTableProxy'
+library(DT) 
 library(shinydashboard)
 library(shinycssloaders)
 library(dplyr)
@@ -94,7 +96,16 @@ server <- function(input, output, session) {
     
     pal <- c("NS" = "grey70", "Over" = "#0072B2", "Under" = "#D55E00")
     
-    max_y <- max(-log10(df$padj), input$pval_thresh, na.rm = TRUE) * 1.05
+    # Modification : Calcul des plages dynamiques pour X et Y
+    max_y <- max(c(0, -log10(df$padj), input$pval_thresh), na.rm = TRUE) * 1.05
+    min_x <- min(c(0, df$log2FC, -input$fc_thresh), na.rm = TRUE) * 1.05
+    max_x <- max(c(0, df$log2FC, input$fc_thresh), na.rm = TRUE) * 1.05
+    
+    # Assurer une plage minimale même si les données sont plates
+    if (is.infinite(max_y) || max_y == 0) max_y <- 1
+    if (is.infinite(min_x) || min_x == 0) min_x <- -1
+    if (is.infinite(max_x) || max_x == 0) max_x <- 1
+    
     
     p <- plot_ly(
       data = df,
@@ -134,10 +145,13 @@ server <- function(input, output, session) {
     
     p <- p %>% layout(
       title = list(text = input$plot_title, x = 0.5, font = list(size = 14, family = "sans-serif", color = "black")),
-      xaxis = list(title = "log2(Fold Change)", range = c(-3, 3), zeroline = FALSE),
+      
+      # Modification : Utilisation des plages dynamiques
+      xaxis = list(title = "log2(Fold Change)", range = c(min_x, max_x), zeroline = FALSE),
       yaxis = list(title = "-log10(P-adj)", 
                    range = c(0, max_y), 
                    zeroline = FALSE),
+      
       showlegend = TRUE,
       legend = list(title = list(text = 'Significance')),
       shapes = list(
@@ -145,7 +159,8 @@ server <- function(input, output, session) {
              line = list(color = "#E64B35FF", dash = 'dash')),
         list(type = 'line', x0 = -input$fc_thresh, x1 = -input$fc_thresh, y0 = 0, y1 = max_y,
              line = list(color = "#E64B35FF", dash = 'dash')),
-        list(type = 'line', x0 = -3, x1 = 3, y0 = input$pval_thresh, y1 = input$pval_thresh,
+        # Modification : Utilisation des plages dynamiques pour la ligne H
+        list(type = 'line', x0 = min_x, x1 = max_x, y0 = input$pval_thresh, y1 = input$pval_thresh,
              line = list(color = "#4DBBD5FF", dash = 'dash'))
       )
     )
@@ -155,38 +170,41 @@ server <- function(input, output, session) {
   
   # === GESTION DES TABLES ===
   
-  # Fonction pour générer les options DT (pour éviter la duplication)
-  dt_options <- function() {
-    list(
-      selection = list(mode = "multiple"),
-      extensions = 'Select', # Ajoute la colonne checkbox + boutons "Select All/None"
-      options = list(scrollX = TRUE, pageLength = 10),
-      rownames = FALSE
-    )
-  }
+  common_dt_options <- list(scrollX = TRUE, pageLength = 10)
   
-  # --- Onglet "Tous" ---
   output$table_volcano <- renderDT({
     df <- filtered_data(); req(df)
     df <- df[, c("GeneName", "ID", "baseMean", "log2FC", "pval", "padj", "significance")]
-    datatable(df, dt_options())
+    datatable(df, 
+              selection = list(mode = "multiple"),
+              extensions = 'Select',
+              options = common_dt_options,
+              rownames = FALSE
+    )
   })
   
-  # --- Onglet "Surexprimés" ---
   output$table_over <- renderDT({
     df <- filtered_data(); req(df)
     df_over <- df[df$significance == "Over", c("GeneName", "ID", "baseMean", "log2FC", "pval", "padj")]
-    datatable(df_over, dt_options())
+    datatable(df_over, 
+              selection = list(mode = "multiple"),
+              extensions = 'Select',
+              options = common_dt_options,
+              rownames = FALSE
+    )
   })
   
-  # --- Onglet "Sousexprimés" ---
   output$table_under <- renderDT({
     df <- filtered_data(); req(df)
     df_under <- df[df$significance == "Under", c("GeneName", "ID", "baseMean", "log2FC", "pval", "padj")]
-    datatable(df_under, dt_options())
+    datatable(df_under, 
+              selection = list(mode = "multiple"),
+              extensions = 'Select',
+              options = common_dt_options,
+              rownames = FALSE
+    )
   })
   
-  # --- Onglet "Sélectionnés" (pas de sélection ici) ---
   output$table_selected <- renderDT({
     df <- filtered_data(); req(df)
     selected <- selected_genes()
@@ -195,11 +213,13 @@ server <- function(input, output, session) {
     } else {
       df_selected <- df[df$GeneName %in% selected, c("GeneName", "ID", "baseMean", "log2FC", "pval", "padj", "significance")]
     }
-    datatable(df_selected, selection = 'none', options = list(scrollX = TRUE, pageLength = 10), rownames = FALSE)
+    datatable(df_selected, 
+              selection = 'none', 
+              options = common_dt_options, 
+              rownames = FALSE)
   })
   
   # === OBSERVATEURS DE SÉLECTION ===
-  # Ils sont "destructifs" : la dernière sélection effectuée remplace la précédente.
   
   observeEvent(input$table_volcano_rows_selected, {
     df <- filtered_data(); req(df)
@@ -310,6 +330,7 @@ server <- function(input, output, session) {
     
     p <- p +
       labs(title = input$plot_title, x = "log2(Fold Change)", y = "-log10(P-adj)") +
+      # L'export ggplot conserve le zoom xlim = c(-3, 3) de l'original
       coord_cartesian(xlim = c(-3, 3)) + 
       theme_bw(base_size = 13) +
       theme(
