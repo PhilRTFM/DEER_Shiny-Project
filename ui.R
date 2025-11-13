@@ -1,12 +1,21 @@
-# ========================= ui.R (Modifié pour Plotly + Onglets DT) =========================
-# D.E.E.R. — Differential Expression & Enrichment in R (multi-select interactive version)
+# ===================================================================
+# ui.R (Corrigé Rendu 2)
+#
+# Auteur: Philippe Stocker
+# Projet: D.E.E.R. Shiny
+#
+# Description:
+# UI corrigée pour le Rendu 2.
+# Intègre shinyjs et un conteneur de plot responsive (ratio 1:1).
+# Supprime le code mort (uiOutput).
+# ===================================================================
 
 library(shiny)
 library(shinydashboard)
 library(shinycssloaders)
 library(DT)
-library(ggplot2)
-library(plotly) # Ajout de la bibliothèque plotly
+library(plotly) 
+library(shinyjs) # <-- AJOUT: Pour la robustesse (ex: reset fileInput)
 
 # ---- COLORS ----
 primary_color   <- "#fdcb6e"
@@ -26,8 +35,9 @@ ui <- dashboardPage(
     sidebarMenu(
       id = "tabs",
       menuItem("Accueil", tabName = "home_tab", icon = icon("home")),
-      fileInput("file", "Téléverser un fichier CSV :", accept = ".csv"),
-      uiOutput("dataset_status_sidebar"),
+      fileInput("file", "Téléverser un fichier CSV :", 
+                accept = c(".csv", "text/csv", "text/plain")), # Accepte plus de types
+      # uiOutput("dataset_status_sidebar"), # <-- SUPPRIMÉ (Code mort)
       menuItem("Analyse", tabName = "volcano_tab", icon = icon("fire")),
       selectInput(
         inputId = "organism_sidebar",
@@ -41,21 +51,45 @@ ui <- dashboardPage(
   
   # ---- BODY ----
   dashboardBody(
+    # --- AJOUT: Initialisation de shinyjs ---
+    useShinyjs(),
+    
+    # --- AJOUT: CSS pour le plot responsive 1:1 ---
+    tags$head(
+      tags$style(HTML("
+        .responsive-plot-container {
+          position: relative;
+          padding-bottom: 100%; /* Ratio 1:1 */
+          height: 0;
+          overflow: hidden;
+        }
+        .responsive-plot-container .shiny-plot-output,
+        .responsive-plot-container .plotly {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100% !important;
+          height: 100% !important;
+        }
+      "))
+    ),
+    
     tabItems(
       # ===== HOME =====
       tabItem(tabName = "home_tab",
               fluidRow(
                 box(width = 12, status = "primary", solidHeader = TRUE, title = "Bienvenue",
                     div(style = "display:flex; align-items:center; gap:32px;",
-                        img(src = "DEER_logo.svg", width = "120px"),
+                        img(src = "DEER_logo.svg", width = "120px"), # Assurez-vous d'avoir 'www/DEER_logo.svg'
                         div(
                           h2("D.E.E.R. - Differential Expression and Enrichment in R",
                              style = paste0("color:", accent_color, "; font-weight:700;")),
-                          p("Importez un CSV pour lancer l'analyse. Accédez ensuite à l'onglet Analyse."),
+                          p("Importez un CSV (séparateur virgule ou point-virgule) pour lancer l'analyse."),
                           tags$ul(
-                            tags$li("Volcano Plot interactif avec info-bulles et sélection multiple"),
-                            tags$li("Lignes de seuils ajustables (log2FC et -log10(padj))"),
-                            tags$li("Téléchargement du graphique avec gènes annotés")
+                            tags$li("Volcano Plot interactif avec sélection par clic et zoom."),
+                            tags$li("Seuils de significativité dynamiques."),
+                            tags$li("Synchronisation entre le graphique et la table 'Tous'."),
+                            tags$li("Téléchargement du graphique (PNG, PDF, SVG) avec gènes annotés.")
                           )
                         )
                     )
@@ -70,22 +104,28 @@ ui <- dashboardPage(
               # --- Volcano Plot and Controls ---
               fluidRow(
                 box(
-                  title = "Volcano Plot interactif (ratio carré, multi-sélection)",
+                  title = "Volcano Plot Interactif", # Titre simplifié
                   width = 8,
                   status = "primary",
+                  solidHeader = TRUE, # Ajout pour la cohérence
+                  
+                  # --- MODIFIÉ: Remplacement du div fixe par le conteneur responsive ---
                   div(
-                    style = "display:flex; align-items:center; justify-content:center;",
-                    # Modification : Remplacement de plotOutput par plotlyOutput
-                    plotlyOutput("volcano_plot", height = "600px", width = "600px") %>%
+                    class = "responsive-plot-container",
+                    plotlyOutput("volcano_plot") %>%
                       withSpinner(type = 8, color = primary_color)
                   )
                 ),
                 
                 box(
-                  title = "Paramètres", width = 4, status = "info",
+                  title = "Paramètres", width = 4, status = "info", solidHeader = TRUE, # Ajout
+                  # Sliders qui seront mis à jour par le serveur
                   sliderInput("fc_thresh", "Seuil log2 Fold Change", min = 0, max = 3, value = 1, step = 0.1),
                   sliderInput("pval_thresh", "Seuil -log10(P-adj)", min = 0, max = 10, value = 1.3, step = 0.1),
-                  textInput("plot_title", "Titre du graphique :", value = "Volcano Plot interactif"),
+                  
+                  hr(), # Séparateur
+                  
+                  textInput("plot_title", "Titre du graphique :", value = "Volcano Plot"),
                   selectInput(
                     "download_format", "Format du graphique :",
                     choices = c("PNG", "PDF", "SVG"), selected = "PNG"
@@ -95,10 +135,9 @@ ui <- dashboardPage(
               ),
               
               # --- Table ---
-              # Modification : Remplacement de box() par tabBox() avec 4 onglets
               fluidRow(
                 tabBox(
-                  title = "Table associée (Sélectionnez dans l'onglet 'Tous')",
+                  title = "Explorateur de Gènes", # Titre simplifié
                   width = 12,
                   id = "table_tabs",
                   tabPanel("Tous", 
